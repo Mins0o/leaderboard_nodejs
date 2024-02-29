@@ -9,7 +9,7 @@ const g_win_prob_template = [[1,1,1],
 const g_form = document.querySelector('form');
 
 function get_data_from_server(){
-  fetch('/rummikub/data')
+  fetch('data')
      .then(response => response.json()) // Parse the response as JSON
      .then(data => {
         console.log(JSON.stringify(data));
@@ -79,7 +79,7 @@ function send_suggestion(date, p1, p2, p3, p4){
     "p3":p3,
     "p4":p4
   }
-  fetch('/rummikub/data', {
+  fetch('data', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -121,7 +121,7 @@ g_form.addEventListener('submit', (event) => {
     //    "inputField1": inputValue
     // };
     // console.log("Sending this data", sendData);
-    // fetch('/rummikub/data', {
+    // fetch('data', {
     //   method: 'POST',
     //   headers: {
     //     'Content-Type': 'application/json'
