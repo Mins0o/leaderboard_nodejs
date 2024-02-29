@@ -42,20 +42,24 @@ app.post('/sendSuggestion', (req, res) => {
   // Get the new data from the request body
   logTime("app.post");
   
-  const receivedData = req.body;
+  const receivedData = req.body; // comes as dictionary/array
   // Read the existing data from the file
-  fs.readFile(__dirname + '/data.json', 'utf8', (err, existingData) => {
+  fs.readFile(__dirname + '/data.json', 'utf8', (err, existingDataString) => { // comes as string
     if (err) {
       // Handle any errors
       console.error(err); // Log the error to the console
       res.status(500).send('Server error'); // Send an error response
     } else {
       // Parse the data as JSON
-      const jsonData = JSON.parse(existingData);
+      const existingData = JSON.parse(existingDataString);
       // Push the new data into the array
       //jsonData.push(newData);
       // Stringify the data back to JSON
-      const updatedData = JSON.stringify(jsonData);
+      const receivedDataString = JSON.stringify(receivedData);
+      // console.log("existingData", existingDataString);
+      // console.log("existingData", existingData);
+      // console.log("updatedData", receivedDataString);
+      // console.log("updatedData", receivedData);
       // Write the updated data to the file
       // fs.writeFile(__dirname + '/data.json', updatedData, 'utf8', (err) => {
       //   if (err) {

@@ -26,7 +26,6 @@ class ServerComm{
   }
 
   async sendSuggestion(date, p1, p2, p3, p4){
-    console.log("sendSuggestion");
     let dataToSend = {
       "date":date,
       "p1":p1,
@@ -34,6 +33,7 @@ class ServerComm{
       "p3":p3,
       "p4":p4
     }
+    //console.log(JSON.stringify(dataToSend));
     await fetch('sendSuggestion', {
       method: 'POST',
       headers: {
@@ -43,7 +43,7 @@ class ServerComm{
     })
     .then(response => response.text())
     .then(receivedData => {
-      console.log(receivedData);
+      // console.log(receivedData);
       // // Clear the input value
       // input.value = '';
       // // Reload the page to fetch the updated data
@@ -77,7 +77,7 @@ class ElementsController{
         submitCallback(date, p1, p2, p3, p4);
       }
       else{
-        console.log('"'+date+'" "'+p1+'" "'+p2+'"');
+        console.log('check input values: "'+date+'" "'+p1+'" "'+p2+'"');
       }
     });
   }
@@ -121,7 +121,6 @@ function get_win_probabilities(elo_array){
             win_prob_array[ii][jj] = win_prob[1];
         }
     }
-    console.log(g_elo_lookup);
     return win_prob_array;
 }
 
