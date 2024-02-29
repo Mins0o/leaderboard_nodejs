@@ -1,4 +1,4 @@
-// (function () {
+(function () {
 
 class Elo {
   eloLookup = {};
@@ -13,22 +13,19 @@ class ServerComm{
   matchData = [];
   matchSuggestions = [];
 
-  getDataFromServer() {
-    fetch('data')
-    .then(response => response.json()) // Parse the response as JSON
+  async getDataFromServer() {
+    await fetch('data')
+    .then(response => response.json())
     .then(receivedData => {
-       console.log("hello", JSON.stringify(receivedData));
-       this.matchData = receivedData["match_data"];
-       this.matchSuggestions = receivedData["mach_suggestion"];
-       return receivedData["match_data"];
+      this.matchData = receivedData["match_data"];
+      this.matchSuggestions = receivedData["mach_suggestion"];
     })
     .catch(error => {
-       console.error(error);
-    })
-    console.log("getData executed");
+      console.error(error);
+    });
   }
 
-  sendSuggestion(date, p1, p2, p3, p4){
+  async sendSuggestion(date, p1, p2, p3, p4){
     console.log("sendSuggestion");
     let dataToSend = {
       "date":date,
@@ -37,7 +34,7 @@ class ServerComm{
       "p3":p3,
       "p4":p4
     }
-    fetch('sendSuggestion', {
+    await fetch('sendSuggestion', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -93,7 +90,6 @@ class ElementsController{
       let p2Cell = newRow.insertCell(2);
       let p3Cell = newRow.insertCell(3);
       let p4Cell = newRow.insertCell(4);
-      console.log(JSON.stringify(row));
       dateCell.textContent = row["date"];
       p1Cell.textContent = row["p1"];
       p2Cell.textContent = row["p2"];
@@ -141,10 +137,8 @@ let serverComm = new ServerComm();
 let controller = new ElementsController();
 
 serverComm.getDataFromServer().then(response => {
-  console.log("promised");
   controller.populateTable(serverComm.matchData);
-})
-controller.populateTable(serverComm.matchData);
+});
 controller.setSubmitAction(serverComm.sendSuggestion);
 
-// })();
+})();
