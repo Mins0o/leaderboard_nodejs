@@ -19,38 +19,40 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/elo_page.html');
 });
 
+function logTime(extraText){
+  let currentTime = new Date();
+  let currentMonth = currentTime.getMonth() + 1;
+  let currentDate = currentTime.getDate();
+  let currentHour = currentTime.getHours();
+  let currentMinute = currentTime.getMinutes();
+  let currentSecond = currentTime.getSeconds();
+  console.log(currentMonth+"-"+currentDate+" "+
+                currentHour+":"+currentMinute+":"+currentSecond, extraText);
+}
+
 // Define a route for the JSON file
 app.get('/data', (req, res) => {
+  logTime("app.get");
   // Send the JSON file as a response
-  let current_time = new Date();
-  console.log(current_time.getMonth()+1, current_time.getDate(), current_time.getHours(), current_time.getMinutes(), current_time.getSeconds());
-  console.log("app.get");
   res.sendFile(__dirname + '/data.json');
 });
 
 // Define a route for the POST request
-app.post('/data', (req, res) => {
+app.post('/sendSuggestion', (req, res) => {
   // Get the new data from the request body
-  const newData = req.body;
-  let current_time = new Date();
-  console.log(current_time.getMonth()+1, current_time.getDate(), current_time.getHours(), current_time.getMinutes(), current_time.getSeconds());
-  console.log("app.post");
-  console.log("req.body", newData);
+  logTime("app.post");
+  
+  const receivedData = req.body;
   // Read the existing data from the file
-  fs.readFile(__dirname + '/data.json', 'utf8', (err, data) => {
+  fs.readFile(__dirname + '/data.json', 'utf8', (err, existingData) => {
     if (err) {
       // Handle any errors
       console.error(err); // Log the error to the console
       res.status(500).send('Server error'); // Send an error response
     } else {
       // Parse the data as JSON
-      //data = data.trim();
-      console.log(data);
-      // let jsonData = {"":""};
-      const jsonData = JSON.parse(data);
+      const jsonData = JSON.parse(existingData);
       // Push the new data into the array
-      console.log(jsonData);
-      console.log(newData);
       //jsonData.push(newData);
       // Stringify the data back to JSON
       const updatedData = JSON.stringify(jsonData);
