@@ -1,0 +1,22 @@
+/* Style the form element */
+form {
+  margin: 20px;
+}
+
+/* Style the input element */
+input {
+  width: 100px;
+  height: 30px;
+  border: 1px solid black;
+  padding: 5px;
+}
+
+/* Style the button element */
+button {
+  width: 100px;
+  height: 40px;
+  background-color: green;
+  color: white;
+  border: none;
+  margin-left: 10px;
+}

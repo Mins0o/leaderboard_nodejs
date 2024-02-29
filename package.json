@@ -1,0 +1,14 @@
+{
+  "name": "rummikub",
+  "version": "1.0.0",
+  "description": "Dynamically served rummikub leaderboad (testing)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Minsoo Kang",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
