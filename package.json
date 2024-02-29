@@ -1,7 +1,7 @@
 {
-  "name": "rummikub",
+  "name": "leaderboard",
   "version": "1.0.0",
-  "description": "Dynamically served rummikub leaderboad (testing)",
+  "description": "Dynamically served leaderboard leaderboad (testing)",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
