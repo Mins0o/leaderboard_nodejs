@@ -89,7 +89,7 @@ class Elo {
   }
 
   recompileElo(){
-    
+    console.log("executing recompileElo");
   }
 }
 
