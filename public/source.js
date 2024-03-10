@@ -21,24 +21,37 @@ class Elo {
     return elo_lookup[player];
   }
 
-  getExpectedScoreList_(playerCount, positionSortedPlayerEloList, positionSortedExpectedScoreList, k=DEFAULT_K){
+  getExpectedScoreList_(playerCount, 
+    positionSortedPlayerEloList, 
+    positionSortedExpectedScoreList, 
+    k=DEFAULT_K){
     let playerEloList = positionSortedPlayerEloList;
     let expectedScoreList = positionSortedExpectedScoreList;
     for (let ii = 0; ii < playerCount; ii++){
       for (let jj = ii+1; jj < playerCount; jj++){
         let winProbPair = this.getWinProbabilty(playerEloList[ii], playerEloList[jj]);
-        expectedScoreList[ii] += winProbPair[0];
-        expectedScoreList[jj] += winProbPair[1];
+        expectedScoreList[ii] += Math.round(winProbPair[0]*k)/k;
+        expectedScoreList[jj] += Math.round(winProbPair[1]*k)/k;
       }
     }
   }
 
-  getScoreChange_(playerCount, expectedScoreList, diffList, k=DEFAULT_K){
+  getScoreChange_(playerCount, expectedScoreList, chageList, k=DEFAULT_K){
     for (let ii = 0; ii < playerCount; ii++){
       let actualScore = playerCount - ii - 1;
       let expectedScore = expectedScoreList[ii];
-      diffList[ii] += Math.round((expectedScore - actualScore)*k);
+      chageList[ii] += Math.round((actualScore - expectedScore)*k);
     }
+  }
+
+  createEloRecord_(playerNameList, eloLookup, changeList){
+    let newElo = structuredClone(eloLookup);
+    playerNameList.forEach(
+      (name, ii)=>{
+        newElo[name] += changeList[ii];
+      }
+    )
+    return newElo;
   }
 
   processMatch(matchResult, eloLookup, k=DEFAULT_K){
@@ -47,27 +60,30 @@ class Elo {
     let playerNameList = [];
     let playerEloList = [];
     let expectedScoreList = [];
-    let diffList = [];
+    let changeList = [];
 
     let ii = 0;
     while (ii < 4 && matchResult[positions[ii]] !== ""){
       playerNameList[ii] = matchResult[positions[ii]];
       playerEloList[ii] = this.get_elo(playerNameList[ii], eloLookup);
       expectedScoreList[ii] = 0;
-      diffList[ii] = 0;
+      changeList[ii] = 0;
       ii++;
     }
     const playerCount = ii;
 
     this.getExpectedScoreList_(playerCount, playerEloList, expectedScoreList, k);
 
-    this.getScoreChange_(playerCount, expectedScoreList, diffList, k)
+    this.getScoreChange_(playerCount, expectedScoreList, changeList, k);
 
-    // console.log(playerNameList);
-    // console.log(playerEloList);
-    // console.log(expectedScoreList);
-    // console.log(diffList);
-    console.log(diffList[0] + diffList[1] + diffList[2]);
+    let newEloRecord = this.createEloRecord_(playerNameList, eloLookup, changeList);
+
+    console.log(playerNameList);
+    console.log(playerEloList);
+    console.log(expectedScoreList);
+    console.log(changeList);
+    console.log(newEloRecord);
+    console.log("original elo record", eloLookup);
   }
 }
 
@@ -178,18 +194,22 @@ function exp10(x){
   return Math.exp(Math.log(10) * x);
 }
 
+function testRun(){
+  let tempEloLookup = {"강유정":1500,"한결":1600,"김기범":1400, "김수연":1400};    
+  let testing = serverComm.matchData[0];
+  elo.processMatch(testing, tempEloLookup);  
+}
+
 let elo = new Elo();
 let serverComm = new ServerComm();
 let controller = new ElementsController();
 
 serverComm.getDataFromServer().then(response => {
   controller.populateTable(serverComm.matchData);
-  for (let ii = 0; ii < 100; ii++){
-    g_temp_elo_lookup = {"강유정":1500+ii,"한결":1600,"김기범":1400};
-    let testing = serverComm.matchData[0];
-    elo.processMatch(testing, g_temp_elo_lookup);
-  }
+  testRun()
 });
 controller.setSubmitAction(serverComm.sendSuggestion);
+
+
 
 // })();
