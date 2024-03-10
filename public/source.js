@@ -1,5 +1,7 @@
 // (function () {
 
+const DEFAULT_K = 20;
+
 class Elo {
   eloLookup = {};
   matchRecord = {};
@@ -12,19 +14,6 @@ class Elo {
     return ([expectedA, expectedB]);
   }
 
-  get_win_probabilities(elo_array){
-    let number_of_players = elo_array.length;
-    let win_prob_array = manual_copy(g_win_prob_template);
-    for(let ii=0; ii<number_of_players; ii++){
-        for(let jj=ii-1; jj>=0; jj--){
-            let win_prob = get_win_probability(elo_array[jj],elo_array[ii]);
-            win_prob_array[jj][ii-1] = win_prob[0];
-            win_prob_array[ii][jj] = win_prob[1];
-        }
-    }
-    return win_prob_array;
-  }
-
   get_elo(player, elo_lookup){
     if(elo_lookup[player] == null ){ // may be null, undefined
         elo_lookup[player] = 1500; // create the new player
@@ -32,32 +21,52 @@ class Elo {
     return elo_lookup[player];
   }
 
-  processMatch(matchResult, eloLookup){
+  getExpectedScoreList_(playerCount, positionSortedPlayerEloList, positionSortedExpectedScoreList, k=DEFAULT_K){
+    let playerEloList = positionSortedPlayerEloList;
+    let expectedScoreList = positionSortedExpectedScoreList;
+    for (let ii = 0; ii < playerCount; ii++){
+      for (let jj = ii+1; jj < playerCount; jj++){
+        let winProbPair = this.getWinProbabilty(playerEloList[ii], playerEloList[jj]);
+        expectedScoreList[ii] += Math.round(winProbPair[0]*k)/k;
+        expectedScoreList[jj] += Math.round(winProbPair[1]*k)/k;
+      }
+    }
+  }
+
+  getScoreChange_(playerCount, expectedScoreList, diffList, k=DEFAULT_K){
+    for (let ii = 0; ii < playerCount; ii++){
+      let actualScore = playerCount - ii - 1;
+      let expectedScore = expectedScoreList[ii];
+      diffList[ii] += Math.round((expectedScore - actualScore)*k);
+    }
+  }
+
+  processMatch(matchResult, eloLookup, k=DEFAULT_K){
     const positions=["p1", "p2", "p3", "p4"];
 
     let playerNameList = [];
     let playerEloList = [];
     let expectedScoreList = [];
+    let diffList = [];
 
     let ii = 0;
     while (ii < 4 && matchResult[positions[ii]] !== ""){
       playerNameList[ii] = matchResult[positions[ii]];
       playerEloList[ii] = this.get_elo(playerNameList[ii], eloLookup);
       expectedScoreList[ii] = 0;
+      diffList[ii] = 0;
       ii++;
     }
-    const player_count = ii;
+    const playerCount = ii;
 
-    for (let ii = 0; ii < player_count; ii++){
-      for (let jj = ii+1; jj < player_count; jj++){
-        let winProbPair = this.getWinProbabilty(playerEloList[ii], playerEloList[jj]);
-        expectedScoreList[ii] += winProbPair[0];
-        expectedScoreList[jj] += winProbPair[1];
-      }
-    }
+    this.getExpectedScoreList_(playerCount, playerEloList, expectedScoreList, k);
+
+    this.getScoreChange_(playerCount, expectedScoreList, diffList, k)
+
     console.log(playerNameList);
     console.log(playerEloList);
     console.log(expectedScoreList);
+    console.log(diffList);
   }
 }
 
