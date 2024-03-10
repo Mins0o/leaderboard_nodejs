@@ -1,10 +1,9 @@
-// (function () {
+(function () {
 
 const DEFAULT_K = 20;
 
 class Elo {
   eloLookup = {};
-  matchRecord = {};
 
   getWinProbabilty(ratingA, ratingB){
     let qA = exp10(ratingA/400);
@@ -77,15 +76,23 @@ class Elo {
     this.getScoreChange_(playerCount, expectedScoreList, changeList, k);
 
     let newEloRecord = this.createEloRecord_(playerNameList, eloLookup, changeList);
+    newEloRecord["date"] = matchResult["date"];
+    
+    // console.log(playerNameList);
+    // console.log(playerEloList);
+    // console.log(expectedScoreList);
+    // console.log(changeList);
+    // console.log(newEloRecord);
+    // console.log("original elo record", eloLookup);
 
-    console.log(playerNameList);
-    console.log(playerEloList);
-    console.log(expectedScoreList);
-    console.log(changeList);
-    console.log(newEloRecord);
-    console.log("original elo record", eloLookup);
+    return newEloRecord;
+  }
+
+  recompileElo(){
+    
   }
 }
+
 
 class ServerComm{
   matchData = [];
@@ -196,13 +203,15 @@ function exp10(x){
 
 function testRun(){
   let tempEloLookup = {"강유정":1500,"한결":1600,"김기범":1400, "김수연":1400};    
-  let testing = serverComm.matchData[0];
-  elo.processMatch(testing, tempEloLookup);  
+  let testing = serverComm.matchData[6];
+  let newEloRecord = elo.processMatch(testing, tempEloLookup);  
+  console.log(newEloRecord);
+  window.recompileElo = elo.recompileElo;
 }
 
-let elo = new Elo();
-let serverComm = new ServerComm();
-let controller = new ElementsController();
+var elo = new Elo();
+var serverComm = new ServerComm();
+var controller = new ElementsController();
 
 serverComm.getDataFromServer().then(response => {
   controller.populateTable(serverComm.matchData);
@@ -212,4 +221,4 @@ controller.setSubmitAction(serverComm.sendSuggestion);
 
 
 
-// })();
+})();
