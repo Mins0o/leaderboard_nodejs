@@ -1,19 +1,15 @@
-(function () {
+// (function () {
 
 class Elo {
   eloLookup = {};
   matchRecord = {};
-  winProbTemplate = [[1,1,1],
-                    [0,1,1],
-                    [0,0,1],
-                    [0,0,0]];
 
-  get_win_probability(rating_a, rating_b){
-    let q_a = exp10(rating_a/400);
-    let q_b = exp10(rating_b/400);
-    let expected_a = q_a/(q_a+ q_b);
-    let expected_b = 1 - expected_a;
-    return ([expected_a, expected_b]);
+  getWinProbabilty(ratingA, ratingB){
+    let qA = exp10(ratingA/400);
+    let qB = exp10(ratingB/400);
+    let expectedA = qA/(qA + qB);
+    let expectedB = 1 - expectedA;
+    return ([expectedA, expectedB]);
   }
 
   get_win_probabilities(elo_array){
@@ -29,17 +25,46 @@ class Elo {
     return win_prob_array;
   }
 
-  get_elo(player){
-    if(g_elo_lookup[player] == null ){ // may be null, undefined
-        g_elo_lookup[player] = 1500; // create the new player
+  get_elo(player, elo_lookup){
+    if(elo_lookup[player] == null ){ // may be null, undefined
+        elo_lookup[player] = 1500; // create the new player
     }
-    return g_elo_lookup[player];
+    return elo_lookup[player];
+  }
+
+  processMatch(matchResult, eloLookup){
+    const positions=["p1", "p2", "p3", "p4"];
+
+    let playerNameList = [];
+    let playerEloList = [];
+    let expectedScoreList = [];
+
+    let ii = 0;
+    while (ii < 4 && matchResult[positions[ii]] !== ""){
+      playerNameList[ii] = matchResult[positions[ii]];
+      playerEloList[ii] = this.get_elo(playerNameList[ii], eloLookup);
+      expectedScoreList[ii] = 0;
+      ii++;
+    }
+    const player_count = ii;
+
+    for (let ii = 0; ii < player_count; ii++){
+      for (let jj = ii+1; jj < player_count; jj++){
+        let winProbPair = this.getWinProbabilty(playerEloList[ii], playerEloList[jj]);
+        expectedScoreList[ii] += winProbPair[0];
+        expectedScoreList[jj] += winProbPair[1];
+      }
+    }
+    console.log(playerNameList);
+    console.log(playerEloList);
+    console.log(expectedScoreList);
   }
 }
 
 class ServerComm{
   matchData = [];
   matchSuggestions = [];
+  eloData = [];
 
   async getDataFromServer() {
     await fetch('data')
@@ -152,4 +177,5 @@ serverComm.getDataFromServer().then(response => {
 });
 controller.setSubmitAction(serverComm.sendSuggestion);
 
-})();
+g_temp_elo_lookup = {"강유정":1500,"한결":1600,"김기범":1400};
+// })();
