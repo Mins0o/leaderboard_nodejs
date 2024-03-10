@@ -4,7 +4,8 @@
     "p1":"John",
     "p2":"Doe",
     "p3":"James",
-    "p4":"Smith"
+    "p4":"Smith",
+    "player_count":4
    },
    {"index":1,
    "date":"2023-09-20",
