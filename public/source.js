@@ -27,8 +27,8 @@ class Elo {
     for (let ii = 0; ii < playerCount; ii++){
       for (let jj = ii+1; jj < playerCount; jj++){
         let winProbPair = this.getWinProbabilty(playerEloList[ii], playerEloList[jj]);
-        expectedScoreList[ii] += Math.round(winProbPair[0]*k)/k;
-        expectedScoreList[jj] += Math.round(winProbPair[1]*k)/k;
+        expectedScoreList[ii] += winProbPair[0];
+        expectedScoreList[jj] += winProbPair[1];
       }
     }
   }
@@ -63,10 +63,11 @@ class Elo {
 
     this.getScoreChange_(playerCount, expectedScoreList, diffList, k)
 
-    console.log(playerNameList);
-    console.log(playerEloList);
-    console.log(expectedScoreList);
-    console.log(diffList);
+    // console.log(playerNameList);
+    // console.log(playerEloList);
+    // console.log(expectedScoreList);
+    // console.log(diffList);
+    console.log(diffList[0] + diffList[1] + diffList[2]);
   }
 }
 
@@ -183,8 +184,12 @@ let controller = new ElementsController();
 
 serverComm.getDataFromServer().then(response => {
   controller.populateTable(serverComm.matchData);
+  for (let ii = 0; ii < 100; ii++){
+    g_temp_elo_lookup = {"강유정":1500+ii,"한결":1600,"김기범":1400};
+    let testing = serverComm.matchData[0];
+    elo.processMatch(testing, g_temp_elo_lookup);
+  }
 });
 controller.setSubmitAction(serverComm.sendSuggestion);
 
-g_temp_elo_lookup = {"강유정":1500,"한결":1600,"김기범":1400};
 // })();
