@@ -37,6 +37,22 @@ app.get('/data', (req, res) => {
   res.sendFile(__dirname + '/data.json');
 });
 
+app.post('/sendEloData', (req, res) => {
+  logTime("app.sendEloData");
+
+  const receivedData = req.body;
+  fs.writeFile(__dirname + '/data__.json', JSON.stringify(receivedData), 'utf8', (err) => {
+    if (err) {
+      // Handle any errors
+      console.error(err); // Log the error to the console
+      res.status(500).send('Server error'); // Send an error response
+    } else {
+    // Send a success response
+      res.status(200).send('Data saved');
+    }
+  });
+});
+
 // Define a route for the POST request
 app.post('/sendSuggestion', (req, res) => {
   // Get the new data from the request body

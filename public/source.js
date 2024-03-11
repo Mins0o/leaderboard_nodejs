@@ -3,7 +3,6 @@
 const DEFAULT_K = 20;
 
 class Elo {
-  eloLookup = {};
 
   getWinProbabilty(ratingA, ratingB){
     let qA = exp10(ratingA/400);
@@ -13,11 +12,11 @@ class Elo {
     return ([expectedA, expectedB]);
   }
 
-  get_elo(player, elo_lookup){
-    if(elo_lookup[player] == null ){ // may be null, undefined
-        elo_lookup[player] = 1500; // create the new player
+  getElo(player, eloLookup){
+    if(eloLookup[player] == null ){ // may be null, undefined
+        eloLookup[player] = 1500; // create the new player
     }
-    return elo_lookup[player];
+    return eloLookup[player];
   }
 
   getExpectedScoreList_(playerCount, 
@@ -64,7 +63,7 @@ class Elo {
     let ii = 0;
     while (ii < 4 && matchResult[positions[ii]] !== ""){
       playerNameList[ii] = matchResult[positions[ii]];
-      playerEloList[ii] = this.get_elo(playerNameList[ii], eloLookup);
+      playerEloList[ii] = this.getElo(playerNameList[ii], eloLookup);
       expectedScoreList[ii] = 0;
       changeList[ii] = 0;
       ii++;
@@ -88,11 +87,15 @@ class Elo {
     return newEloRecord;
   }
 
-  recompileElo(){
-    console.log("executing recompileElo");
+  recompileElo(matchData){
+    let  eloData = [];
+    matchData.forEach((match, ii)=>{
+      eloData[ii] = this.processMatch(match,(ii==0?{"date":""}:eloData[eloData.length-1]));
+    })
+    console.log(eloData);
+    return eloData;
   }
 }
-
 
 class ServerComm{
   matchData = [];
@@ -108,6 +111,23 @@ class ServerComm{
     })
     .catch(error => {
       console.error(error);
+    });
+  }
+
+  async sendEloData(eloData){
+    await fetch('sendEloData', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(eloData)
+    })
+    .then(response => response.text())
+    .then(receivedData => {
+      console.log(receivedData)
+    })
+    .catch(error => {
+      console.error(error)
     });
   }
 
@@ -206,7 +226,8 @@ function testRun(){
   let testing = serverComm.matchData[6];
   let newEloRecord = elo.processMatch(testing, tempEloLookup);  
   console.log(newEloRecord);
-  window.recompileElo = elo.recompileElo;
+  window.recompileElo = ()=>{return elo.recompileElo(serverComm.matchData)};
+  window.sendEloData = (_)=>{serverComm.sendEloData(_)};
 }
 
 var elo = new Elo();
