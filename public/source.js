@@ -78,13 +78,6 @@ class Elo {
     let newEloRecord = this.createEloRecord_(playerNameList, eloLookup, changeList);
     newEloRecord["date"] = matchResult["date"];
     
-    // console.log(playerNameList);
-    // console.log(playerEloList);
-    // console.log(expectedScoreList);
-    // console.log(changeList);
-    // console.log(newEloRecord);
-    // console.log("original elo record", eloLookup);
-
     return newEloRecord;
   }
 
@@ -93,7 +86,6 @@ class Elo {
     matchData.forEach((match, ii)=>{
       eloData[ii] = this.processMatch(match,(ii==0?{"date":""}:eloData[eloData.length-1]));
     })
-    console.log(eloData);
     return eloData;
   }
 }
@@ -133,7 +125,7 @@ class ServerComm{
     })
     .then(response => response.text())
     .then(receivedData => {
-      console.log(receivedData)
+      ;
     })
     .catch(error => {
       console.error(error)
@@ -148,7 +140,6 @@ class ServerComm{
       "p3":p3,
       "p4":p4
     }
-    //console.log(JSON.stringify(dataToSend));
     await fetch('sendSuggestion', {
       method: 'POST',
       headers: {
@@ -158,7 +149,6 @@ class ServerComm{
     })
     .then(response => response.text())
     .then(receivedData => {
-      // console.log(receivedData);
       // // Clear the input value
       // input.value = '';
       // // Reload the page to fetch the updated data
@@ -195,7 +185,7 @@ class ElementsController{
       p4.value = "";
     }
     else{
-      console.log('check input values: "'+
+      console.error('Check input values: "'+
                 date.value+'" "'+
                 p1.value+'" "'+
                 p2.value+'"');
@@ -231,10 +221,10 @@ function exp10(x){
 }
 
 function testRun(){
-  alert(JSON.stringify(serverComm.matchData, null, 2));
-  alert(JSON.stringify(elo.eloData, null, 2));
+  // alert(JSON.stringify(serverComm.matchData, null, 2));
+  // alert(JSON.stringify(elo.eloData, null, 2));
   let writeHere = document.getElementsByClassName("log-alternative")[0];
-  writeHere.appendChild(document.createTextNode(JSON.stringify(elo.eloData, null, 2)))
+  // writeHere.appendChild(document.createTextNode(JSON.stringify(elo.eloData, null, 2)))
 }
 
 var elo = new Elo();
@@ -248,27 +238,27 @@ serverComm.getDataFromServer().then(response => {
 });
 controller.setSubmitAction(serverComm.sendSuggestion);
 
-const temporaryChart = (()=>{
-const ctx = document.getElementById('myChart');
+const chartTesting = (()=>{
+  const ctx = document.getElementById('myChart');
 
-new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-    datasets: [{
-      label: '# of Votes',
-      data: [12, 19, 3, 5, 2, 3],
-      borderWidth: 1
-    }]
-  },
-  options: {
-    scales: {
-      y: {
-        beginAtZero: true
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      datasets: [{
+        label: '# of Votes',
+        data: [12, 19, 3, 5, 2, 3],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
       }
     }
-  }
-});
+  });
 })()
 
 
