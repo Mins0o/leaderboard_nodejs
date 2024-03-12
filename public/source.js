@@ -3,6 +3,7 @@
 const DEFAULT_K = 20;
 
 class Elo {
+  eloData = [];
 
   getWinProbabilty(ratingA, ratingB){
     let qA = exp10(ratingA/400);
@@ -108,6 +109,14 @@ class ServerComm{
     .then(receivedData => {
       this.matchData = receivedData["match_data"];
       this.matchSuggestions = receivedData["mach_suggestion"];
+    })
+    .catch(error => {
+      console.error(error);
+    });
+    await fetch('elo')
+    .then(response => response.json())
+    .then(receivedData => {
+      this.eloData = receivedData;
     })
     .catch(error => {
       console.error(error);
@@ -222,12 +231,10 @@ function exp10(x){
 }
 
 function testRun(){
-  let tempEloLookup = {"강유정":1500,"한결":1600,"김기범":1400, "김수연":1400};    
-  let testing = serverComm.matchData[6];
-  let newEloRecord = elo.processMatch(testing, tempEloLookup);  
-  console.log(newEloRecord);
-  window.recompileElo = ()=>{return elo.recompileElo(serverComm.matchData)};
-  window.sendEloData = (_)=>{serverComm.sendEloData(_)};
+  alert(JSON.stringify(serverComm.matchData, null 2));
+  alert(JSON.stringify(elo.eloData, null, 2));
+  let writeHere = document.getElementsByClassName("log-alternative")[0];
+  writeHere.appendChild(document.createTextNode(JSON.stringify(elo.eloData, null, 2)))
 }
 
 var elo = new Elo();
@@ -236,7 +243,8 @@ var controller = new ElementsController();
 
 serverComm.getDataFromServer().then(response => {
   controller.populateTable(serverComm.matchData);
-  testRun()
+  elo.eloData = serverComm.eloData;
+  testRun();
 });
 controller.setSubmitAction(serverComm.sendSuggestion);
 

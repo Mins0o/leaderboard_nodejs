@@ -37,11 +37,16 @@ app.get('/data', (req, res) => {
   res.sendFile(__dirname + '/data.json');
 });
 
+app.get('/elo', (req, res) => {
+  logTime('app.elo');
+  res.sendFile(__dirname + '/elo_data.json');
+});
+
 app.post('/sendEloData', (req, res) => {
   logTime("app.sendEloData");
 
   const receivedData = req.body;
-  fs.writeFile(__dirname + '/data__.json', JSON.stringify(receivedData), 'utf8', (err) => {
+  fs.writeFile(__dirname + '/elo_data.json', JSON.stringify(receivedData), 'utf8', (err) => {
     if (err) {
       // Handle any errors
       console.error(err); // Log the error to the console
