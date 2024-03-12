@@ -20,7 +20,7 @@ class Elo {
     return eloLookup[player];
   }
 
-  getExpectedScoreList_(playerCount, 
+  #getExpectedScoreList_(playerCount, 
     positionSortedPlayerEloList, 
     positionSortedExpectedScoreList, 
     k=DEFAULT_K){
@@ -35,7 +35,7 @@ class Elo {
     }
   }
 
-  getScoreChange_(playerCount, expectedScoreList, chageList, k=DEFAULT_K){
+  #getScoreChange_(playerCount, expectedScoreList, chageList, k=DEFAULT_K){
     for (let ii = 0; ii < playerCount; ii++){
       let actualScore = playerCount - ii - 1;
       let expectedScore = expectedScoreList[ii];
@@ -43,7 +43,7 @@ class Elo {
     }
   }
 
-  createEloRecord_(playerNameList, eloLookup, changeList){
+  #createEloRecord_(playerNameList, eloLookup, changeList){
     let newElo = structuredClone(eloLookup);
     playerNameList.forEach(
       (name, ii)=>{
@@ -71,11 +71,11 @@ class Elo {
     }
     const playerCount = ii;
 
-    this.getExpectedScoreList_(playerCount, playerEloList, expectedScoreList, k);
+    this.#getExpectedScoreList_(playerCount, playerEloList, expectedScoreList, k);
 
-    this.getScoreChange_(playerCount, expectedScoreList, changeList, k);
+    this.#getScoreChange_(playerCount, expectedScoreList, changeList, k);
 
-    let newEloRecord = this.createEloRecord_(playerNameList, eloLookup, changeList);
+    let newEloRecord = this.#createEloRecord_(playerNameList, eloLookup, changeList);
     newEloRecord["date"] = matchResult["date"];
     
     return newEloRecord;
@@ -163,8 +163,11 @@ class ServerComm{
 class ElementsController{
   matchRecordTable = document.getElementsByClassName("match-record-table")[0];
   suggestionForm = document.getElementsByClassName("suggestion-form")[0];
-  #previousCallBack = (a,b,c,d)=>{};
-  #basicSubmitAction = (callback) => (event) => {
+
+  #previousSubmitCallBack_ = (a,b,c,d)=>{};
+  // submit action is a function takes in an event,
+  // createSubmitAction: is a function that creates an submit action from the input callback
+  #createSubmitAction_ = (callback) => (event) => {
     // Prevent the default behavior of the form submission
     event.preventDefault();
 
@@ -192,11 +195,12 @@ class ElementsController{
     }
   }
 
+  // submitCallback: is a function that takes in four input
   setSubmitAction(submitCallback){
     // Add an event listener for the form submission
-    this.suggestionForm.removeEventListener('submit', this.#basicSubmitAction(this.#previousCallBack));
-    this.suggestionForm.addEventListener('submit', this.#basicSubmitAction(submitCallback));
-    this.#previousCallBack = submitCallback;
+    this.suggestionForm.removeEventListener('submit', this.#createSubmitAction_(this.#previousSubmitCallBack_));
+    this.suggestionForm.addEventListener('submit', this.#createSubmitAction_(submitCallback));
+    this.#previousSubmitCallBack_ = submitCallback;
   }
 
   populateTable(matchData){
