@@ -231,7 +231,7 @@ function exp10(x){
 }
 
 function testRun(){
-  alert(JSON.stringify(serverComm.matchData, null 2));
+  alert(JSON.stringify(serverComm.matchData, null, 2));
   alert(JSON.stringify(elo.eloData, null, 2));
   let writeHere = document.getElementsByClassName("log-alternative")[0];
   writeHere.appendChild(document.createTextNode(JSON.stringify(elo.eloData, null, 2)))
