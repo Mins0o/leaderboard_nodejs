@@ -218,6 +218,10 @@ class ElementsController{
       p4Cell.textContent = row["p4"];
     });
   }
+
+  drawChart(eloData){
+    ;
+  }
 }
 
 function exp10(x){

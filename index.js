@@ -73,8 +73,6 @@ app.post('/sendSuggestion', (req, res) => {
     } else {
       // Parse the data as JSON
       const existingData = JSON.parse(existingDataString);
-      // Push the new data into the array
-      //jsonData.push(newData);
       // Stringify the data back to JSON
       const receivedDataString = JSON.stringify(receivedData);
       // console.log("existingData", existingDataString);

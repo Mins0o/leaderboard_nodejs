@@ -3,7 +3,7 @@
    https://nodejs.org/en/learn/getting-started/how-to-install-nodejs
 2. Go to the project's root folder and run
    ``` bash
-   node index.json
+   node index.js
    ```
 3. By default, the page is served to [localhost:3000](http://localhost:3000)
 
