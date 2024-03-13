@@ -4,8 +4,9 @@ const DEFAULT_K = 20;
 
 class Elo {
   eloData = [];
+  nameList = [];
 
-  getWinProbabilty(ratingA, ratingB){
+  #getWinProbabilty_(ratingA, ratingB){
     let qA = exp10(ratingA/400);
     let qB = exp10(ratingB/400);
     let expectedA = qA/(qA + qB);
@@ -13,7 +14,7 @@ class Elo {
     return ([expectedA, expectedB]);
   }
 
-  getElo(player, eloLookup){
+  #getElo_(player, eloLookup){
     if(eloLookup[player] == null ){ // may be null, undefined
         eloLookup[player] = 1500; // create the new player
     }
@@ -28,7 +29,7 @@ class Elo {
     let expectedScoreList = positionSortedExpectedScoreList;
     for (let ii = 0; ii < playerCount; ii++){
       for (let jj = ii+1; jj < playerCount; jj++){
-        let winProbPair = this.getWinProbabilty(playerEloList[ii], playerEloList[jj]);
+        let winProbPair = this.#getWinProbabilty_(playerEloList[ii], playerEloList[jj]);
         expectedScoreList[ii] += Math.round(winProbPair[0]*k)/k;
         expectedScoreList[jj] += Math.round(winProbPair[1]*k)/k;
       }
@@ -64,7 +65,7 @@ class Elo {
     let ii = 0;
     while (ii < 4 && matchResult[positions[ii]] !== ""){
       playerNameList[ii] = matchResult[positions[ii]];
-      playerEloList[ii] = this.getElo(playerNameList[ii], eloLookup);
+      playerEloList[ii] = this.#getElo_(playerNameList[ii], eloLookup);
       expectedScoreList[ii] = 0;
       changeList[ii] = 0;
       ii++;
@@ -87,6 +88,20 @@ class Elo {
       eloData[ii] = this.processMatch(match,(ii==0?{"date":""}:eloData[eloData.length-1]));
     })
     return eloData;
+  }
+
+  #getNameList_(eloData){
+    let lastLineNames = Object.keys(eloData.at(-1));
+    const indexToDelete = lastLineNames.indexOf("date");
+    if (indexToDelete >-1){
+      lastLineNames.splice(indexToDelete, 1);
+    }
+    return lastLineNames.sort();
+  }
+
+  setEloData(eloData){
+    this.eloData = structuredClone(eloData);
+    this.nameList = this.#getNameList_(eloData);
   }
 }
 
@@ -163,7 +178,14 @@ class ServerComm{
 class ElementsController{
   matchRecordTable = document.getElementsByClassName("match-record-table")[0];
   suggestionForm = document.getElementsByClassName("suggestion-form")[0];
+  dateInput = document.getElementsByClassName("date-input")[0];
 
+  constructor(){
+    this.dateInput.value = (new Date()).toISOString().substr(0, 10);
+    this.namesDataList = document.createElement("datalist");
+    this.namesDataList.id = "names-data-list";
+    this.suggestionForm.appendChild(this.namesDataList);
+  }
   #previousSubmitCallBack_ = (a,b,c,d)=>{};
   // submit action is a function takes in an event,
   // createSubmitAction: is a function that creates an submit action from the input callback
@@ -181,7 +203,7 @@ class ElementsController{
     // Check if the input value is not empty
     if (date.value && p1.value && p2.value) {
       callback(date.value, p1.value, p2.value, p3.value, p4.value);
-      date.value = "";
+      // date.value = "";
       p1.value = "";
       p2.value = "";
       p3.value = "";
@@ -217,13 +239,27 @@ class ElementsController{
 
       for (let ii = 0; ii<4; ii++){
         cells[ii].textContent = data[ii];
-	cells[ii].classList.add("participant-name");
+        cells[ii].classList.add("participant-name");
       }
     });
   }
 
   drawChart(eloData){
     ;
+  }
+
+  makeInputNameOptions(nameList){
+    this.suggestionForm.removeChild(this.namesDataList);
+    this.namesDataList = document.createElement("datalist");
+    this.namesDataList.id = "names-data-list";
+    nameList.forEach((name, ii) =>{
+      let nameOption = document.createElement("option");
+      nameOption.appendChild(document.createTextNode(name));
+      nameOption.value = name;
+      this.namesDataList.appendChild(nameOption);
+      window.namesDataList = this.namesDataList;
+    });
+    this.suggestionForm.appendChild(this.namesDataList);
   }
 }
 
@@ -239,8 +275,8 @@ function elementLog(x){
 }
 
 function testRun(){
-  elementLog("Elo");
-  elementLog(JSON.stringify(elo.eloData, null, 2));
+  // elementLog("Elo");
+  // elementLog(JSON.stringify(elo.eloData, null, 2));
 }
 
 var elo = new Elo();
@@ -249,7 +285,8 @@ var controller = new ElementsController();
 
 serverComm.getDataFromServer().then(response => {
   controller.populateTable(serverComm.matchData);
-  elo.eloData = serverComm.eloData;
+  elo.setEloData(serverComm.eloData);
+  controller.makeInputNameOptions(elo.nameList);
   testRun();
 });
 

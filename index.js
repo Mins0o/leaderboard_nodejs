@@ -46,7 +46,7 @@ app.post('/sendEloData', (req, res) => {
   logTime("app.sendEloData");
 
   const receivedData = req.body;
-  fs.writeFile(__dirname + '/elo_data.json', JSON.stringify(receivedData), 'utf8', (err) => {
+  fs.writeFile(__dirname + '/elo_data.json', JSON.stringify(receivedData,null,2), 'utf8', (err) => {
     if (err) {
       // Handle any errors
       console.error(err); // Log the error to the console
@@ -75,21 +75,22 @@ app.post('/sendSuggestion', (req, res) => {
       const existingData = JSON.parse(existingDataString);
       // Stringify the data back to JSON
       const receivedDataString = JSON.stringify(receivedData);
-      // console.log("existingData", existingDataString);
+      // console.log("existingDataString", existingDataString);
       // console.log("existingData", existingData);
-      // console.log("updatedData", receivedDataString);
+      console.log("receivedDataString", receivedDataString);
       // console.log("updatedData", receivedData);
       // Write the updated data to the file
-      // fs.writeFile(__dirname + '/data.json', updatedData, 'utf8', (err) => {
-      //   if (err) {
-      //     // Handle any errors
-      //     console.error(err); // Log the error to the console
-      //     res.status(500).send('Server error'); // Send an error response
-      //   } else {
-      //     // Send a success response
-      //     res.status(200).send('Data saved');
-      //   }
-      // });
+      existingData["match_suggestion"].push(receivedData);
+      fs.writeFile(__dirname + '/data.json', JSON.stringify(existingData,null,2), 'utf8', (err) => {
+        if (err) {
+          // Handle any errors
+          console.error(err); // Log the error to the console
+          res.status(500).send('Server error'); // Send an error response
+        } else {
+          // Send a success response
+          res.status(200).send('Data saved');
+        }
+      });
     }
   });
 });
