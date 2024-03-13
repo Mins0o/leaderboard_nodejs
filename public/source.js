@@ -204,18 +204,21 @@ class ElementsController{
   }
 
   populateTable(matchData){
-    matchData.forEach(row => {
+    matchData.forEach(dataRow => {
       let newRow = this.matchRecordTable.insertRow(-1);
       let dateCell = newRow.insertCell(0);
       let p1Cell = newRow.insertCell(1);
       let p2Cell = newRow.insertCell(2);
       let p3Cell = newRow.insertCell(3);
       let p4Cell = newRow.insertCell(4);
-      dateCell.textContent = row["date"];
-      p1Cell.textContent = row["p1"];
-      p2Cell.textContent = row["p2"];
-      p3Cell.textContent = row["p3"];
-      p4Cell.textContent = row["p4"];
+      let cells = [p1Cell,  p2Cell, p3Cell, p4Cell];
+      let data = [dataRow["p1"], dataRow["p2"], dataRow["p3"], dataRow["p4"]];
+      dateCell.textContent = dataRow["date"];
+
+      for (let ii = 0; ii<4; ii++){
+        cells[ii].textContent = data[ii];
+	cells[ii].classList.add("participant-name");
+      }
     });
   }
 
@@ -228,12 +231,16 @@ function exp10(x){
   return Math.exp(Math.log(10) * x);
 }
 
-function testRun(){
-  // alert(JSON.stringify(serverComm.matchData, null, 2));
-  // alert(JSON.stringify(elo.eloData, null, 2));
+function elementLog(x){
   let writeHere = document.getElementsByClassName("log-alternative")[0];
-  writeHere.appendChild(document.createTextNode("ELO"))
-  writeHere.appendChild(document.createTextNode(JSON.stringify(elo.eloData, null, 2)))
+  let paragraph = document.createElement("p");
+  writeHere.appendChild(paragraph);
+  paragraph.appendChild(document.createTextNode(x));
+}
+
+function testRun(){
+  elementLog("Elo");
+  elementLog(JSON.stringify(elo.eloData, null, 2));
 }
 
 var elo = new Elo();
@@ -245,6 +252,7 @@ serverComm.getDataFromServer().then(response => {
   elo.eloData = serverComm.eloData;
   testRun();
 });
+
 controller.setSubmitAction(serverComm.sendSuggestion);
 
 const chartTesting = (()=>{
