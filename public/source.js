@@ -208,6 +208,7 @@ class ElementsController{
       p2.value = "";
       p3.value = "";
       p4.value = "";
+      p1.focus();
     }
     else{
       console.error('Check input values: "'+
