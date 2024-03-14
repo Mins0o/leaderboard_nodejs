@@ -115,7 +115,7 @@ class ServerComm{
     .then(response => response.json())
     .then(receivedData => {
       this.matchData = receivedData["match_data"];
-      this.matchSuggestions = receivedData["mach_suggestion"];
+      this.matchSuggestions = receivedData["match_suggestion"];
     })
     .catch(error => {
       console.error(error);
@@ -177,6 +177,7 @@ class ServerComm{
 
 class ElementsController{
   matchRecordTable = document.getElementsByClassName("match-record-table")[0];
+  matchSuggestionTable = document.getElementsByClassName("match-suggestion-table")[0];
   suggestionForm = document.getElementsByClassName("suggestion-form")[0];
   dateInput = document.getElementsByClassName("date-input")[0];
 
@@ -186,7 +187,9 @@ class ElementsController{
     this.namesDataList.id = "names-data-list";
     this.suggestionForm.appendChild(this.namesDataList);
   }
+  
   #previousSubmitCallBack_ = (a,b,c,d)=>{};
+
   // submit action is a function takes in an event,
   // createSubmitAction: is a function that creates an submit action from the input callback
   #createSubmitAction_ = (callback) => (event) => {
@@ -203,6 +206,12 @@ class ElementsController{
     // Check if the input value is not empty
     if (date.value && p1.value && p2.value) {
       callback(date.value, p1.value, p2.value, p3.value, p4.value);
+      this.#appendToTable_([{"date":date.value,
+                              "p1": p1.value,
+			      "p2": p2.value,
+			      "p3": p3.value,
+			      "p4": p4.value,
+			      }], this.matchSuggestionTable);
       // date.value = "";
       p1.value = "";
       p2.value = "";
@@ -226,9 +235,9 @@ class ElementsController{
     this.#previousSubmitCallBack_ = submitCallback;
   }
 
-  populateTable(matchData){
-    matchData.forEach(dataRow => {
-      let newRow = this.matchRecordTable.insertRow(-1);
+  #appendToTable_(data, tableElement){
+    data.forEach(dataRow => {
+      let newRow = tableElement.insertRow(-1);
       let dateCell = newRow.insertCell(0);
       let p1Cell = newRow.insertCell(1);
       let p2Cell = newRow.insertCell(2);
@@ -243,6 +252,11 @@ class ElementsController{
         cells[ii].classList.add("participant-name");
       }
     });
+  }
+
+  populateTables(matchData, matchSuggestion){
+    this.#appendToTable_(matchData, this.matchRecordTable);
+    this.#appendToTable_(matchSuggestion, this.matchSuggestionTable);
   }
 
   drawChart(eloData){
@@ -285,7 +299,7 @@ var serverComm = new ServerComm();
 var controller = new ElementsController();
 
 serverComm.getDataFromServer().then(response => {
-  controller.populateTable(serverComm.matchData);
+  controller.populateTables(serverComm.matchData, serverComm.matchSuggestions);
   elo.setEloData(serverComm.eloData);
   controller.makeInputNameOptions(elo.nameList);
   testRun();
