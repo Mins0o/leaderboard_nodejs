@@ -1,6 +1,7 @@
 data.json
-.data.json.bak
+.data.json.bak*
 elo_data.json
-.elo_data.json.bak
+.elo_data.json.bak*
 node_modules/
 *.swp
+.data_backup/
