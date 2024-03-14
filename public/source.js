@@ -103,6 +103,35 @@ class Elo {
     this.eloData = structuredClone(eloData);
     this.nameList = this.#getNameList_(eloData);
   }
+
+  createChartDataset(eloData, nameList){
+    let xAxis = eloData.map((listing) => {
+      return listing["date"];
+    });
+
+    let dataset = nameList.map((name) => {
+      return {
+        label: name,
+        borderColor: this.nameColorMap[name],
+        fill: false,
+        tension: 0.5,
+        data: [],
+      }
+    });
+
+    eloData.forEach((eloRecord) => {
+      dataset.forEach((person) => {
+        let eloSearch = eloRecord[person["label"]];
+        if (eloSearch != null){
+          person["data"].push(eloSearch);
+        }
+        else {
+          person["data"].push(NaN);
+        }
+      });
+    });
+    return [xAxis, dataset]
+  }
 }
 
 class ServerComm{
@@ -259,8 +288,50 @@ class ElementsController{
     this.#appendToTable_(matchSuggestion, this.matchSuggestionTable);
   }
 
-  drawChart(eloData){
-    ;
+  drawChart(xAxis, datasets){
+    const ctx = document.getElementById('myChart');
+
+    const datapoints = [1000, 1200, 1200, 1600, 1600, 1200, NaN, 1800, 1200, 1250, 1050, 1100, 1700];
+    const data = {
+      labels: xAxis,
+      datasets: datasets
+    };
+    
+    const config = {
+      type: 'line',
+      data: data,
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Chart.js Line Chart - Cubic interpolation mode'
+          },
+        },
+        interaction: {
+          intersect: false,
+        },
+        scales: {
+          x: {
+            display: true,
+            title: {
+              display: true
+            }
+          },
+          y: {
+            display: true,
+            title: {
+              display: true,
+              text: 'Value'
+            },
+            suggestedMin: 1350,
+            suggestedMax: 1700
+          }
+        }
+      },
+    };
+    
+    new Chart(ctx, config);
   }
 
   makeInputNameOptions(nameList){
@@ -289,47 +360,29 @@ function elementLog(x){
   paragraph.appendChild(document.createTextNode(x));
 }
 
-function testRun(){
-  // elementLog("Elo");
-  // elementLog(JSON.stringify(elo.eloData, null, 2));
-}
-
 var elo = new Elo();
 var serverComm = new ServerComm();
 var controller = new ElementsController();
 
+function testRun(){
+}
+
 serverComm.getDataFromServer().then(response => {
   controller.populateTables(serverComm.matchData, serverComm.matchSuggestions);
   elo.setEloData(serverComm.eloData);
+  if (elo.eloData.length !== serverComm.matchData.length){
+    console.log(elo.eloData.length, serverComm.matchData.length)
+    let newEloData = elo.recompileElo(serverComm.matchData);
+    elo.setEloData(newEloData);
+    serverComm.sendEloData(newEloData);
+  }
   controller.makeInputNameOptions(elo.nameList);
+  let [xAxis, chartDataset] = elo.createChartDataset(elo.eloData, elo.nameList);
+  controller.drawChart(xAxis, chartDataset);
   testRun();
 });
 
 controller.setSubmitAction(serverComm.sendSuggestion);
-
-const chartTesting = (()=>{
-  const ctx = document.getElementById('myChart');
-
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-      datasets: [{
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-})()
-
 
 
 })();
