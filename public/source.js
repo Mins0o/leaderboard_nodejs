@@ -5,6 +5,8 @@ const DEFAULT_K = 20;
 class Elo {
   eloData = [];
   nameList = [];
+  nameColorMap = {
+                }
 
   #getWinProbabilty_(ratingA, ratingB){
     let qA = exp10(ratingA/400);
@@ -110,6 +112,10 @@ class Elo {
     });
 
     let dataset = nameList.map((name) => {
+      let color = "";
+      if (this.nameColorMap != null && this.nameColorMap[name] != null){
+        color = this.nameColorMap[name];
+      }
       return {
         label: name,
         borderColor: this.nameColorMap[name],
@@ -324,7 +330,7 @@ class ElementsController{
               display: true,
               text: 'Value'
             },
-            suggestedMin: 1350,
+            suggestedMin: 1400,
             suggestedMax: 1700
           }
         }

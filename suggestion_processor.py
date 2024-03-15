@@ -87,10 +87,10 @@ if __name__ == "__main__":
     elif choice == "delete":
         data = delete_suggestion(data)
     else:
+        with open(f".data_backup/.data.json.bak.{datetime.now().strftime('%m%d_%H_%M_%S')}", "w") as write_file:
+            json.dump(data, write_file, indent=2, ensure_ascii=False)
         exit(0)
 
-    with open(f".data_backup/.data.json.bak.{datetime.now().strftime('%m%d_%H_%M_%S')}", "w") as write_file:
-        json.dump(data, write_file, indent=2, ensure_ascii=False)
 
     
     with open(f"data.json", "w") as write_file:
