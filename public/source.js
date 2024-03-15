@@ -17,7 +17,7 @@ class Elo {
   }
 
   #getElo_(player, eloLookup){
-    if(eloLookup[player] == null ){ // may be null, undefined
+    if(eloLookup[player] == null ){ // may be null or undefined
         eloLookup[player] = 1500; // create the new player
     }
     return eloLookup[player];
@@ -57,6 +57,7 @@ class Elo {
   }
 
   processMatch(matchResult, eloLookup, k=DEFAULT_K){
+    eloLookup = structuredClone(eloLookup);
     const positions=["p1", "p2", "p3", "p4"];
 
     let playerNameList = [];
@@ -77,7 +78,6 @@ class Elo {
     this.#getExpectedScoreList_(playerCount, playerEloList, expectedScoreList, k);
 
     this.#getScoreChange_(playerCount, expectedScoreList, changeList, k);
-
     let newEloRecord = this.#createEloRecord_(playerNameList, eloLookup, changeList);
     newEloRecord["date"] = matchResult["date"];
     
@@ -297,7 +297,6 @@ class ElementsController{
   drawChart(xAxis, datasets){
     const ctx = document.getElementById('myChart');
 
-    const datapoints = [1000, 1200, 1200, 1600, 1600, 1200, NaN, 1800, 1200, 1250, 1050, 1100, 1700];
     const data = {
       labels: xAxis,
       datasets: datasets
