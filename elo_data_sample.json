@@ -1,20 +1,31 @@
-[
-    {
-        "date": "2023-09-15",
-        "John": 1530,
-        "Doe": 1510,
-        "James": 1490,
-        "Smith": 1470
-    },
-    {
-        "date": "2023-09-20",
-        "John": 1530,
-        "Doe": 1510,
-        "James": 1490,
-        "Smith": 1470,
-        "Emily": 1530,
-        "Thompson": 1510,
-        "Robert": 1490,
-        "Billy": 1470
+{
+    "elo_data": [
+        {
+            "date": "2023-09-15",
+            "John": 1530,
+            "Doe": 1510,
+            "James": 1490,
+            "Smith": 1470
+        },
+        {
+            "date": "2023-09-20",
+            "John": 1530,
+            "Doe": 1510,
+            "James": 1490,
+            "Smith": 1470,
+            "Emily": 1530,
+            "Thompson": 1510,
+            "Robert": 1490,
+            "Billy": 1470
+        }
+    ],
+    "name_color_map": {
+        "John": "rgb(54, 162, 235)",
+        "Doe": "#ff598f",
+        "James": "#f3872f",
+        "Smith": "#236e96",
+        "Emily": "#ffd700",
+        "Thompson": "#15d3b2",
+        "Robert": "#15b2d3"
     }
-]
+}
