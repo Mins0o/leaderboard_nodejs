@@ -5,8 +5,7 @@ const DEFAULT_K = 20;
 class Elo {
   eloData = [];
   nameList = [];
-  nameColorMap = {
-                }
+  nameColorMap = {};
 
   #getWinProbabilty_(ratingA, ratingB){
     let qA = exp10(ratingA/400);
@@ -101,9 +100,10 @@ class Elo {
     return lastLineNames.sort();
   }
 
-  setEloData(eloData){
+  setEloData(eloData, nameColorMap){
     this.eloData = structuredClone(eloData);
     this.nameList = this.#getNameList_(eloData);
+    this.nameColorMap = nameColorMap;
   }
 
   createChartDataset(eloData, nameList){
@@ -144,6 +144,7 @@ class ServerComm{
   matchData = [];
   matchSuggestions = [];
   eloData = [];
+  nameColorMap = {};
 
   async getDataFromServer() {
     await fetch('data')
@@ -158,7 +159,8 @@ class ServerComm{
     await fetch('elo')
     .then(response => response.json())
     .then(receivedData => {
-      this.eloData = receivedData;
+      this.eloData = receivedData["elo_data"];
+      this.nameColorMap = receivedData["name_color_map"]
     })
     .catch(error => {
       console.error(error);
@@ -374,7 +376,7 @@ function testRun(){
 
 serverComm.getDataFromServer().then(response => {
   controller.populateTables(serverComm.matchData, serverComm.matchSuggestions);
-  elo.setEloData(serverComm.eloData);
+  elo.setEloData(serverComm.eloData, serverComm.nameColorMap);
   if (elo.eloData.length !== serverComm.matchData.length){
     console.log(elo.eloData.length, serverComm.matchData.length)
     let newEloData = elo.recompileElo(serverComm.matchData);
