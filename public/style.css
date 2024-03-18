@@ -24,3 +24,52 @@ button {
 .participant-name{
   text-align: right;
 }
+
+.page-title-section{
+  width: 100%;
+  align-content: center;
+}
+
+.page-title-image{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+}
+
+.chart-section{
+  background-color: rgba(255,255,255,0.9);
+  border-radius: 15px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body{
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: rgb(147, 178, 225);
+}
+
+.table-title{
+  text-align: center;
+}
+
+.match-records-section{
+  align-content: center;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 10px;
+  background-color: rgba(255,255,255,0.8);
+  border-radius: 20px;
+}
+
+.match-record-table{
+  display: flex;
+  justify-content: center;
+}
+
+.date-column{
+  width: 150px;
+  text-align: center;
+}

@@ -5,3 +5,4 @@ elo_data.json
 node_modules/
 *.swp
 .data_backup/
+title_logo.png
