@@ -90,7 +90,7 @@ class Elo {
     })
     return eloData;
   }
-
+  
   #getNameList_(eloData){
     let lastLineNames = Object.keys(eloData.at(-1));
     const indexToDelete = lastLineNames.indexOf("date");
@@ -312,8 +312,28 @@ class ElementsController{
         plugins: {
           title: {
             display: true,
-            text: 'Chart.js Line Chart - Cubic interpolation mode'
+            text: 'ELO graph'
           },
+	  zoom:{
+	    limits: {
+	      x: { 
+	        minRange : 10,
+	      },
+	    },
+	    zoom: {
+	      wheel: {
+	        enabled: true,
+              },
+	      pinch: {
+	        enabled: true
+	      },
+	      mode: 'x',
+	    },
+	    pan: {
+	      enabled: true,
+	      mode: 'x',
+	    }
+	  }
         },
         interaction: {
           intersect: false,
@@ -329,16 +349,19 @@ class ElementsController{
             display: true,
             title: {
               display: true,
-              text: 'Value'
+              text: 'ELO Ratings'
             },
-            suggestedMin: 1400,
-            suggestedMax: 1700
           }
         }
       },
     };
     
-    new Chart(ctx, config);
+    let chart = new ChartJS(ctx, config);
+    setTimeout(()=>{
+    chart.zoom(1.4);
+    chart.pan({x : -Number.MAX_SAFE_INTEGER}, undefined, 'default');
+    },10);
+    return chart;
   }
 
   makeInputNameOptions(nameList){
@@ -380,7 +403,7 @@ serverComm.getDataFromServer().then(response => {
   if (elo.eloData.length !== serverComm.matchData.length){
     console.log(elo.eloData.length, serverComm.matchData.length)
     let newEloData = elo.recompileElo(serverComm.matchData);
-    elo.setEloData(newEloData);
+    elo.setEloData(newEloData, serverComm.nameColorMap);
     serverComm.sendEloData(newEloData);
   }
   controller.makeInputNameOptions(elo.nameList);
