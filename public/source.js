@@ -311,7 +311,7 @@ class ElementsController{
   }
 
   populateTables(matchData, matchSuggestion){
-    this.#appendToTable_(matchData, this.matchRecordTable);
+    this.#appendToTable_(structuredClone(matchData).reverse(), this.matchRecordTable);
     this.#appendToTable_(matchSuggestion, this.matchSuggestionTable);
   }
 
