@@ -5,7 +5,7 @@ const DEFAULT_K = 20;
 class Elo {
   eloData = [];
   nameList = [];
-  nameColorMap = {};
+  winProbTable = {};
 
   #getWinProbabilty_(ratingA, ratingB){
     let qA = exp10(ratingA/400);
@@ -91,6 +91,25 @@ class Elo {
     return eloData;
   }
   
+  #makeWinProbTable_(eloSnapShot){
+    delete eloSnapShot.date;
+    let names = Object.keys(eloSnapShot).sort();
+    let winProbs = {};
+    names.forEach((player) => {
+      winProbs[player] = {};
+      names.forEach((challenger) => {
+        winProbs[player][challenger] = 
+                 Math.round(this.#getWinProbabilty_(this.#getElo_(player, eloSnapShot),
+                                          this.#getElo_(challenger, eloSnapShot))[0]*10000)/100;
+      });
+    });
+    return winProbs;
+  }
+
+  getWinProbTable(){
+    this.winProbTable = this.#makeWinProbTable_(structuredClone(this.eloData.at(-1)));
+  }
+
   #getNameList_(eloData){
     let lastLineNames = Object.keys(eloData.at(-1));
     const indexToDelete = lastLineNames.indexOf("date");
@@ -394,9 +413,6 @@ var elo = new Elo();
 var serverComm = new ServerComm();
 var controller = new ElementsController();
 
-function testRun(){
-}
-
 serverComm.getDataFromServer().then(response => {
   controller.populateTables(serverComm.matchData, serverComm.matchSuggestions);
   elo.setEloData(serverComm.eloData, serverComm.nameColorMap);
@@ -409,7 +425,7 @@ serverComm.getDataFromServer().then(response => {
   controller.makeInputNameOptions(elo.nameList);
   let [xAxis, chartDataset] = elo.createChartDataset(elo.eloData, elo.nameList);
   controller.drawChart(xAxis, chartDataset);
-  testRun();
+  elo.getWinProbTable();
 });
 
 controller.setSubmitAction(serverComm.sendSuggestion);
