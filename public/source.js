@@ -5,7 +5,7 @@ const DEFAULT_K = 20;
 class Elo {
   eloData = [];
   nameList = [];
-  winProbTable = {};
+  winProbArray = {};
 
   #getWinProbabilty_(ratingA, ratingB){
     let qA = exp10(ratingA/400);
@@ -91,7 +91,7 @@ class Elo {
     return eloData;
   }
   
-  #makeWinProbTable_(eloSnapShot){
+  #makeWinProbArray_(eloSnapShot){
     delete eloSnapShot.date;
     let names = Object.keys(eloSnapShot).sort();
     let winProbs = {};
@@ -106,8 +106,8 @@ class Elo {
     return winProbs;
   }
 
-  getWinProbTable(){
-    this.winProbTable = this.#makeWinProbTable_(structuredClone(this.eloData.at(-1)));
+  getWinProbArray(){
+    this.winProbArray = this.#makeWinProbArray_(structuredClone(this.eloData.at(-1)));
   }
 
   #getNameList_(eloData){
@@ -236,6 +236,7 @@ class ElementsController{
   matchSuggestionTable = document.getElementsByClassName("match-suggestion-table")[0];
   suggestionForm = document.getElementsByClassName("suggestion-form")[0];
   dateInput = document.getElementsByClassName("date-input")[0];
+  winProbTable = document.getElementsByClassName("win-prob-table")[0];
 
   constructor(){
     this.dateInput.value = (new Date()).toISOString().substr(0, 10);
@@ -313,6 +314,29 @@ class ElementsController{
   populateTables(matchData, matchSuggestion){
     this.#appendToTable_(structuredClone(matchData).reverse(), this.matchRecordTable);
     this.#appendToTable_(matchSuggestion, this.matchSuggestionTable);
+  }
+
+  populateWinProbTable(winProbability){
+    let names = Object.keys(winProbability).sort();
+    let headerRow = this.winProbTable.insertRow(-1);
+    headerRow.insertCell(0);
+
+    names.forEach((name) => {
+      let header = document.createElement("th");
+      header.appendChild(document.createTextNode(name));
+      headerRow.appendChild(header);
+    })
+
+    names.forEach((player) => {
+      let newRow = this.winProbTable.insertRow(-1);
+      let header = document.createElement("th");
+      header.appendChild(document.createTextNode(player));
+      newRow.appendChild(header);
+      names.forEach((challenger) => {
+        let winProb = newRow.insertCell(-1);
+        winProb.appendChild(document.createTextNode(winProbability[player][challenger]));
+      });
+    })
   }
 
   drawChart(xAxis, datasets){
@@ -425,7 +449,8 @@ serverComm.getDataFromServer().then(response => {
   controller.makeInputNameOptions(elo.nameList);
   let [xAxis, chartDataset] = elo.createChartDataset(elo.eloData, elo.nameList);
   controller.drawChart(xAxis, chartDataset);
-  elo.getWinProbTable();
+  elo.getWinProbArray();
+  controller.populateWinProbTable(elo.winProbArray);
 });
 
 controller.setSubmitAction(serverComm.sendSuggestion);
